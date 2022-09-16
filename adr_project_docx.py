@@ -24,7 +24,8 @@ def E(tag, text):
 
 # 写入
 html = []
-html.append(E("h1", project_info['title']))
+p_title = project_info['title']
+html.append(E("h1", p_title))
 html.append(E("i", project_info['description']))
 
 
@@ -32,8 +33,10 @@ for record in record_info:
     html.append(E("h3", record["title"]))
     html.append(E("div", record["description"]))
 
-
+o_pdf = "{}.pdf".format(p_title)
 pypandoc.convert_text("".join(html), to='md', format='html', outputfile="tmp.md", extra_args=["-s", "--toc"])
-pypandoc.convert_file("tmp.md", to='pdf', format='md', outputfile="{}.pdf".format(project_info['title']), extra_args=["--pdf-engine=xelatex", "--toc", "-V","mainfont=Microsoft YaHei UI" ])
+
+extra_args=["--pdf-engine=xelatex", "--toc", "-V","mainfont=Microsoft YaHei UI","-V", "title={}".format(p_title) ]
+pypandoc.convert_file("tmp.md", to='pdf', format='md', outputfile=o_pdf, extra_args=extra_args)
 
 os.remove("tmp.md")
