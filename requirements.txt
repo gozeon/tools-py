@@ -3,3 +3,4 @@ numpy
 requests
 xlsxwriter
 pypandoc
+pyttsx3
