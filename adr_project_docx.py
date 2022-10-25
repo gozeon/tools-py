@@ -1,11 +1,14 @@
 import os
-from turtle import ht
+from datetime import date
 
+from markdownify import markdownify as md
 import requests
 import pypandoc
 
+
 api_url = os.getenv("api_url")
 project_id = os.getenv("project_id")
+author =  os.getenv("author")
 
 # 获取项目
 response = requests.get("{}/api/project/{}".format(api_url, project_id))
@@ -17,26 +20,29 @@ response = requests.get("{}/api/record/{}".format(api_url, project_id))
 record_res = response.json()
 record_info = record_res['data']
 
-
-def E(tag, text):
-    return "<{tag}>{text}</{tag}>".format(tag=tag, text=text)
-
-
 # 写入
-html = []
-p_title = project_info['title']
-html.append(E("h1", p_title))
-html.append(E("i", project_info['description']))
+text = []
 
+p_title = project_info['title']
+text.append("""
+
+---
+title: {title}
+author: {author}
+date: {date}
+subject: {description}
+---
+
+""".format(title=p_title, author=author, date=date.today().isoformat(), description=project_info['description']))
 
 for record in record_info:
-    html.append(E("h3", record["title"]))
-    html.append(E("div", record["description"]))
+    if record["status"] == 1:
+        text.append("# " + record["title"] + '\n\n')
+        text.append(md(record["description"]))
 
+
+# print(text)
 o_pdf = "{}.pdf".format(p_title)
-pypandoc.convert_text("".join(html), to='md', format='html', outputfile="tmp.md", extra_args=["-s", "--toc"])
 
-extra_args=["--pdf-engine=xelatex", "--toc", "-V","mainfont=Microsoft YaHei UI","-V", "title={}".format(p_title) ]
-pypandoc.convert_file("tmp.md", to='pdf', format='md', outputfile=o_pdf, extra_args=extra_args)
-
-os.remove("tmp.md")
+extra_args=["--pdf-engine=xelatex", "--standalone","--toc", "--number-sections", "--template=templates/eisvogel.tex", "-V","CJKmainfont=Microsoft YaHei UI" ]
+pypandoc.convert_text("".join(text), to='pdf', format='md', outputfile=o_pdf, extra_args=extra_args)

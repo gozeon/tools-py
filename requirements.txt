@@ -4,3 +4,4 @@ requests
 xlsxwriter
 pypandoc
 pyttsx3
+markdownify
