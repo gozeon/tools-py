@@ -5,3 +5,4 @@ xlsxwriter
 pypandoc
 pyttsx3
 markdownify
+openpyxl
