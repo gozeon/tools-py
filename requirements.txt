@@ -6,3 +6,4 @@ pypandoc
 pyttsx3
 markdownify
 openpyxl
+opencv-python
